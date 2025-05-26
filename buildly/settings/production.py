@@ -79,3 +79,5 @@ TOKEN_SECRET_KEY = os.getenv('TOKEN_SECRET_KEY', '')
 USE_X_FORWARDED_HOST = True if os.getenv('USE_X_FORWARDED_HOST') == 'True' else False
 
 INSTALLED_APPS += ('django.contrib.postgres',)
+
+AUTO_APPROVE_USER = os.getenv('AUTO_APPROVE_USER', 'False')
