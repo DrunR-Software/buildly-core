@@ -5,22 +5,26 @@ on:
     branches:
       - prod
 
+env:
+  REGION: us
+  IMAGE_NAME: ${{ vars.PROD_DOCKER_IMAGE }}
+
 jobs:
   build:
     name: Build and Push image to GCR
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: ${{ vars.PROD_DOCKER_IMAGE }}
     steps:
-    - uses: actions/checkout@v2
+    - name: "Checkout"
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
     # auto generate tag from label defined in Dockerfile
-    - uses: butlerlogic/action-autotag@stable
+    - uses: butlerlogic/action-autotag@1.1.2
       id: tag_version
-      with:
+      env:
         GITHUB_TOKEN: "${{ secrets.RELEASE_TOKEN }}"
+      with:
         strategy: docker
         tag_prefix: "v"
 
@@ -44,29 +48,25 @@ jobs:
         draft: false
         prerelease: false
 
-    # Login to docker
-    - name: Docker login
-      uses: docker/login-action@v1
+    - id: "auth"
+      uses: "google-github-actions/auth@v1"
       with:
-        registry: gcr.io
-        username: _json_key
-        password: ${{ secrets.GCR_JSON_KEY }}
+        credentials_json: "${{ secrets.GCR_JSON_KEY }}"
 
-    # Build docker image
+    - name: "Set up Cloud SDK"
+      uses: "google-github-actions/setup-gcloud@v1"
+
+    - name: "Use gcloud CLI"
+      run: "gcloud info"
+
+    - name: "Docker auth"
+      run: |-
+        gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
     - name: Build docker image
       run: docker build -t $IMAGE_NAME:latest .
-
-    # Push docker image to GCR
-    - name: Push to Google Container Registry
+  
+    - name: Push to Google Artifact Registry
       run: docker push $IMAGE_NAME:latest
-
-    # Send message on Slack
-    - name: Slack Notification
-      uses: rtCamp/action-slack-notify@v2
-      env:
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_MESSAGE: 'Production Docker Image of buildly core pushed to Google Container Registry Successfully'
-        MSG_MINIMAL: true
 
     # Send email alert
     - name: Email Alert
@@ -80,3 +80,13 @@ jobs:
         to: ${{ secrets.RECIPIENT_EMAIL }}
         from: ${{ secrets.SENDER_EMAIL }}
         body: Production Docker Image of buildly core pushed to Google Container Registry Successfully
+
+    - name: Deploy on Kapstan
+      id: Kapstan
+      uses: kapstan-io/deployment-action@latest
+      with: 
+        application_name: buildly-core
+        image_repository_name: ${{ env.IMAGE_NAME }}
+        image_tag: latest
+        kapstan_api_key: ${{ secrets.PROD_KAPSTAN_KEY }}
+        wait_for_deployment: false
