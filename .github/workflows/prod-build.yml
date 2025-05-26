@@ -36,17 +36,17 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
 
     # Create release
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@latest
-      env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-      with:
-        tag_name: ${{ steps.tag_version.outputs.tagname }}
-        release_name: Release ${{ steps.tag_version.outputs.tagname }}
-        body: ${{ steps.build_changelog.outputs.changelog }}
-        draft: false
-        prerelease: false
+    # - name: Create Release
+    #   id: create_release
+    #   uses: actions/create-release@latest
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+    #   with:
+    #     tag_name: ${{ steps.tag_version.outputs.tagname }}
+    #     release_name: Release ${{ steps.tag_version.outputs.tagname }}
+    #     body: ${{ steps.build_changelog.outputs.changelog }}
+    #     draft: false
+    #     prerelease: false
 
     - id: "auth"
       uses: "google-github-actions/auth@v1"
