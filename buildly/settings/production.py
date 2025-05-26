@@ -1,5 +1,4 @@
 from .base import *
-from .authentication import *
 from .email import *
 
 # CORS to allow external apps auth through OAuth 2
@@ -69,10 +68,10 @@ LOGGING = {
     },
 }
 
-HUBSPOT_API_KEY = os.environ['HUBSPOT_API_KEY']
+HUBSPOT_API_KEY = os.getenv('HUBSPOT_API_KEY', '')
 
-SECRET_KEY = os.environ['SECRET_KEY']
-TOKEN_SECRET_KEY = os.environ['TOKEN_SECRET_KEY']
+SECRET_KEY = os.getenv('SECRET_KEY', '')
+TOKEN_SECRET_KEY = os.getenv('TOKEN_SECRET_KEY', '')
 
 # NGINX and HTTPS
 # https://docs.djangoproject.com/en/1.11/ref/settings/#std:setting-USE_X_FORWARDED_HOST
@@ -80,3 +79,5 @@ TOKEN_SECRET_KEY = os.environ['TOKEN_SECRET_KEY']
 USE_X_FORWARDED_HOST = True if os.getenv('USE_X_FORWARDED_HOST') == 'True' else False
 
 INSTALLED_APPS += ('django.contrib.postgres',)
+
+AUTO_APPROVE_USER = os.getenv('AUTO_APPROVE_USER', 'False')

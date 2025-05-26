@@ -2,7 +2,6 @@ from __future__ import absolute_import, unicode_literals
 
 API_GATEWAY_RESERVED_NAMES = [
     'admin',
-    'oauth',
     'health_check',
     'docs',
     'complete',
@@ -11,7 +10,7 @@ API_GATEWAY_RESERVED_NAMES = [
     'core',
     'logicmodule',
     'organization',
-    'consortium',
     'datamesh',
     'stripe',
+    'subscription',
 ]

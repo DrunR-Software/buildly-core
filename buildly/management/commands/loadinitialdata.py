@@ -9,7 +9,6 @@ from django.db import transaction
 from core.models import ROLE_VIEW_ONLY, ROLE_ORGANIZATION_ADMIN, ROLE_WORKFLOW_ADMIN, ROLE_WORKFLOW_TEAM, \
     Organization, CoreUser, CoreGroup, OrganizationType
 
-from oauth2_provider.models import Application
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +62,7 @@ class Command(BaseCommand):
             logger.info("Creating Super User")
             user_password = None
             if settings.DEBUG:
-                user_password = settings.SUPER_USER_PASSWORD if settings.SUPER_USER_PASSWORD else 'zGtkgLvmNiKm'
+                user_password = settings.SUPER_USER_PASSWORD if settings.SUPER_USER_PASSWORD else 'Djf0KG0YDr8m'
             elif settings.SUPER_USER_PASSWORD:
                 user_password = settings.SUPER_USER_PASSWORD
             else:
@@ -75,42 +74,12 @@ class Command(BaseCommand):
                 su = CoreUser.objects.create_superuser(
                     first_name='System',
                     last_name='Admin',
-                    username='67OAI8DD5I1O',
+                    username='DA05L19J52XX',
                     email='admin@example.com',
                     password=user_password,
                     organization=self._default_org,
                 )
                 su.core_groups.add(self._su_group)
-
-    def _create_oauth_application(self):
-        updated = False
-        if settings.OAUTH_CLIENT_ID and settings.OAUTH_CLIENT_SECRET:
-            try:
-                app = Application.objects.get(client_id=settings.OAUTH_CLIENT_ID)
-
-                if app.hash_client_secret:
-                    # verify that the client secret is the same
-                    if not check_password(app.hash_client_secret, settings.OAUTH_CLIENT_SECRET):
-                        app.client_secret = settings.OAUTH_CLIENT_SECRET
-                        app.save()
-                        updated = True
-                else:
-                    # check if the client secret is the same
-                    if app.client_secret != settings.OAUTH_CLIENT_SECRET:
-                        app.client_secret = settings.OAUTH_CLIENT_SECRET
-                        app.save()
-                        updated = True
-            except Application.DoesNotExist:
-                app = None
-
-            if not app or updated:
-                _, _ = Application.objects.update_or_create(
-                    client_id=settings.OAUTH_CLIENT_ID,
-                    client_secret=settings.OAUTH_CLIENT_SECRET,
-                    name='buildly oauth2',
-                    client_type=Application.CLIENT_PUBLIC,
-                    authorization_grant_type=Application.GRANT_PASSWORD,
-                )
 
     @transaction.atomic
     def handle(self, *args, **options):

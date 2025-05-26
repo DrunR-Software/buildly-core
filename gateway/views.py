@@ -9,9 +9,7 @@ from gateway import exceptions
 from gateway.permissions import AllowLogicModuleGroup
 from gateway.request import GatewayRequest, AsyncGatewayRequest
 
-
 logger = logging.getLogger(__name__)
-
 
 class APIGatewayView(views.APIView):
     """
@@ -52,7 +50,6 @@ class APIGatewayView(views.APIView):
         """
         Create a request for the defined service
         """
-        # validate incoming request before creating a service request
         try:
             self._validate_incoming_request(request, **kwargs)
         except exceptions.RequestValidationError as e:
@@ -75,14 +72,6 @@ class APIGatewayView(views.APIView):
         """
         if (
             request.META['REQUEST_METHOD'] in ['PUT', 'PATCH', 'DELETE']
-            and kwargs['pk'] is None
+            and kwargs.get('pk') is None
         ):
             raise exceptions.RequestValidationError('The object ID is missing.', 400)
-
-
-class APIAsyncGatewayView(APIGatewayView):
-    """
-    Async version of APIGatewayView
-    """
-
-    gateway_request_class = AsyncGatewayRequest
