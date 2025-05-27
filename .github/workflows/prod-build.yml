@@ -51,7 +51,11 @@ jobs:
     - id: "auth"
       uses: "google-github-actions/auth@v1"
       with:
+<<<<<<< HEAD
         credentials_json: "${{ secrets.PROD_GCR_JSON_KEY }}"
+=======
+        credentials_json: "${{ secrets.GCR_PROD_JSON_KEY }}"
+>>>>>>> ff9dabe97d69b4ea9632b10a20c9530c53b0d7dc
 
     - name: "Set up Cloud SDK"
       uses: "google-github-actions/setup-gcloud@v1"
@@ -69,17 +73,17 @@ jobs:
       run: docker push $IMAGE_NAME:latest
 
     # Send email alert
-    - name: Email Alert
-      uses: dawidd6/action-send-mail@v3
-      with:
-        server_address: smtp.gmail.com
-        server_port: 465
-        username: ${{ secrets.MAIL_USERNAME }}
-        password: ${{ secrets.MAIL_PASSWORD }}
-        subject: Github Actions Build and Push job alert
-        to: ${{ secrets.RECIPIENT_EMAIL }}
-        from: ${{ secrets.SENDER_EMAIL }}
-        body: Production Docker Image of buildly core pushed to Google Container Registry Successfully
+    #- name: Email Alert
+    #  uses: dawidd6/action-send-mail@v3
+    #  with:
+    #    server_address: smtp.gmail.com
+    #    server_port: 465
+    #    username: ${{ secrets.MAIL_USERNAME }}
+    #    password: ${{ secrets.MAIL_PASSWORD }}
+    #    subject: Github Actions Build and Push job alert
+    #    to: ${{ secrets.RECIPIENT_EMAIL }}
+    #    from: ${{ secrets.SENDER_EMAIL }}
+    #    body: Production Docker Image of buildly core pushed to Google Container Registry Successfully
 
     - name: Deploy on Kapstan
       id: Kapstan
