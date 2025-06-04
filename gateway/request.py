@@ -111,6 +111,7 @@ class GatewayRequest(BaseGatewayRequest):
         url_kwargs = self.url_kwargs.copy()
         if 'pk' in url_kwargs:
             url_kwargs['id'] = url_kwargs.pop('pk')
+            url_kwargs.pop('model', None)
         # --------------------------------------------------------
 
         # perform a service data request
