@@ -107,8 +107,14 @@ class GatewayRequest(BaseGatewayRequest):
         # create a client for performing data requests
         client = SwaggerClient(spec, self.request)
 
+        # --- FIX: Map 'pk' to 'id' for downstream Swagger spec ---
+        url_kwargs = self.url_kwargs.copy()
+        if 'pk' in url_kwargs:
+            url_kwargs['id'] = url_kwargs.pop('pk')
+        # --------------------------------------------------------
+
         # perform a service data request
-        content, status_code, headers = client.request(**self.url_kwargs)
+        content, status_code, headers = client.request(**url_kwargs)
 
         # calls to individual service as per relationship
         # call to join record insertion method
@@ -120,7 +126,7 @@ class GatewayRequest(BaseGatewayRequest):
                 logger.error(e.content)
 
         if 'join' in self.request.query_params and self.request.method == 'DELETE' and status_code == 204:
-            delete_join_record(pk=self.url_kwargs['pk'], previous_pk=None)  # delete join record
+            delete_join_record(pk=url_kwargs.get('id'), previous_pk=None)  # delete join record
 
         if type(content) in [dict, list]:
             content = json.dumps(content, cls=utils.GatewayJSONEncoder)
