@@ -96,7 +96,6 @@ class GatewayRequest(BaseGatewayRequest):
         """
         Make request to underlying service(s) and returns aggregated response.
         """
-        # init swagger spec from the service swagger doc file
         try:
             spec = self._get_swagger_spec(self.url_kwargs['service'])
         except exceptions.ServiceDoesNotExist as e:
@@ -104,11 +103,16 @@ class GatewayRequest(BaseGatewayRequest):
                 e.content, e.status, {'Content-Type': e.content_type}
             )
 
-        # create a client for performing data requests
         client = SwaggerClient(spec, self.request)
 
-        # perform a service data request
-        content, status_code, headers = client.request(**self.url_kwargs)
+        # --- Fix: Remove 'model' for detail endpoints ---
+        url_kwargs = self.url_kwargs.copy()
+        if 'pk' in url_kwargs:
+            url_kwargs['id'] = url_kwargs.pop('pk')
+            url_kwargs.pop('model', None)  # Remove model for detail endpoint
+        # -----------------------------------------------
+
+        content, status_code, headers = client.request(**url_kwargs)
 
         # calls to individual service as per relationship
         # call to join record insertion method
