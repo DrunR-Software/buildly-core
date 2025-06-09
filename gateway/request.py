@@ -91,6 +91,19 @@ class GatewayRequest(BaseGatewayRequest):
     """
     Allows to perform synchronous requests to underlying services with requests package
     """
+    def _get_detail_path_param_name(self, spec: Spec, model: str) -> str:
+        """
+        Inspect the Swagger spec to find the path parameter name for the detail endpoint.
+        """
+        # Find the path for the detail endpoint, e.g. /restaurants/{id}/
+        for path, path_item in spec._paths.items():
+            if path.startswith(f'/{model}/') and '{' in path:
+                # Extract parameter name from path, e.g. /restaurants/{id}/ -> id
+                start = path.find('{') + 1
+                end = path.find('}')
+                return path[start:end]
+        # Fallback to 'id'
+        return 'id'
 
     def perform(self) -> GatewayResponse:
         """
@@ -107,7 +120,9 @@ class GatewayRequest(BaseGatewayRequest):
 
         url_kwargs = self.url_kwargs.copy()
         if 'pk' in url_kwargs:
-            url_kwargs['id'] = url_kwargs.pop('pk')
+            model = url_kwargs.get('model')
+            param_name = self._get_detail_path_param_name(spec, model)
+            url_kwargs[param_name] = url_kwargs.pop('pk')
         content, status_code, headers = client.request(**url_kwargs)
 
         # calls to individual service as per relationship
