@@ -105,14 +105,7 @@ class GatewayRequest(BaseGatewayRequest):
 
         client = SwaggerClient(spec, self.request)
 
-        # --- Fix: Remove 'model' for detail endpoints ---
-        url_kwargs = self.url_kwargs.copy()
-        if 'pk' in url_kwargs:
-            url_kwargs['id'] = url_kwargs.pop('pk')
-            url_kwargs.pop('model', None)  # Remove model for detail endpoint
-        # -----------------------------------------------
-
-        content, status_code, headers = client.request(**url_kwargs)
+        content, status_code, headers = client.request(**self.url_kwargs)
 
         # calls to individual service as per relationship
         # call to join record insertion method
