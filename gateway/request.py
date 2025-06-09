@@ -105,7 +105,10 @@ class GatewayRequest(BaseGatewayRequest):
 
         client = SwaggerClient(spec, self.request)
 
-        content, status_code, headers = client.request(**self.url_kwargs)
+        url_kwargs = self.url_kwargs.copy()
+        if 'pk' in url_kwargs:
+            url_kwargs['id'] = url_kwargs.pop('pk')
+        content, status_code, headers = client.request(**url_kwargs)
 
         # calls to individual service as per relationship
         # call to join record insertion method
