@@ -21,7 +21,7 @@ jobs:
         password: ${{ secrets.GCR_JSON_KEY }}
 
     - name: Build docker image
-      run: docker build -t $IMAGE_NAME:latest .
+      run: docker build -t $IMAGE_NAME:app-${{ github.run_id }} .
 
     - name: Push to Google Container Registry
-      run: docker push $IMAGE_NAME:latest
+      run: docker push $IMAGE_NAME:app-${{ github.run_id }}
