@@ -96,7 +96,7 @@ class GatewayRequest(BaseGatewayRequest):
         Inspect the Swagger spec to find the path parameter name for the detail endpoint.
         """
         # Find the path for the detail endpoint, e.g. /restaurants/{id}/
-        for path, path_item in spec._paths.items():
+        for path, path_item in spec.spec_dict.get("paths", {}).items():
             if path.startswith(f'/{model}/') and '{' in path:
                 # Extract parameter name from path, e.g. /restaurants/{id}/ -> id
                 start = path.find('{') + 1
