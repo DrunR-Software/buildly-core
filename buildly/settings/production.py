@@ -80,4 +80,4 @@ USE_X_FORWARDED_HOST = True if os.getenv('USE_X_FORWARDED_HOST') == 'True' else 
 
 INSTALLED_APPS += ('django.contrib.postgres',)
 
-AUTO_APPROVE_USER = os.getenv('AUTO_APPROVE_USER', 'False')
+AUTO_APPROVE_USER = False if os.getenv('AUTO_APPROVE_USER') == 'False' else True
