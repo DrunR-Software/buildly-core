@@ -63,10 +63,10 @@ jobs:
       run: |-
         gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
     - name: Build docker image
-      run: docker build -t $IMAGE_NAME:latest .
+      run: docker build -t $IMAGE_NAME:app-${{ github.run_id }} .
   
     - name: Push to Google Artifact Registry
-      run: docker push $IMAGE_NAME:latest
+      run: docker push $IMAGE_NAME:app-${{ github.run_id }}
 
     # Send email alert
     #- name: Email Alert
@@ -80,13 +80,3 @@ jobs:
     #    to: ${{ secrets.RECIPIENT_EMAIL }}
     #    from: ${{ secrets.SENDER_EMAIL }}
     #    body: Production Docker Image of buildly core pushed to Google Container Registry Successfully
-
-    - name: Deploy on Kapstan
-      id: Kapstan
-      uses: kapstan-io/deployment-action@latest
-      with: 
-        application_name: buildly-core
-        image_repository_name: ${{ env.IMAGE_NAME }}
-        image_tag: latest
-        kapstan_api_key: ${{ secrets.PROD_KAPSTAN_KEY }}
-        wait_for_deployment: false
