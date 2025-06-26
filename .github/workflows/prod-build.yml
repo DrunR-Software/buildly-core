@@ -63,10 +63,10 @@ jobs:
       run: |-
         gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
     - name: Build docker image
-      run: docker build -t $IMAGE_NAME:app-${{ github.run_id }} .
+      run: docker build -t $IMAGE_NAME:latest .
   
     - name: Push to Google Artifact Registry
-      run: docker push $IMAGE_NAME:app-${{ github.run_id }}
+      run: docker push $IMAGE_NAME:latest
 
     # Send email alert
     #- name: Email Alert
