@@ -213,7 +213,7 @@ class CoreUserWritableSerializer(CoreUserSerializer):
 
         # check whether an old organization
         if not is_new_org:
-            coreuser.is_active = False
+            coreuser.is_active = settings.AUTO_APPROVE_USER
             coreuser.save()
 
             org_user = (
