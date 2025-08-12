@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
 from core.models import CoreUser, CoreGroup, CoreSites, EmailTemplate, Industry, LogicModule, Organization, OrganizationType, Partner, \
-    Coupon, Referral, Subscription
+    Coupon, Referral, Subscription, ResetPasswordToken
 
 
 class LogicModuleAdmin(admin.ModelAdmin):
@@ -95,6 +95,12 @@ class SubscriptionAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related('user', 'organization')
+    
+
+@admin.register(ResetPasswordToken)
+class ResetPasswordTokenAdmin(admin.ModelAdmin):
+    list_display = ('token', 'uid', 'expires_at')
+    display = "Reset Password Token"
 
 
 admin.site.register(LogicModule, LogicModuleAdmin)
