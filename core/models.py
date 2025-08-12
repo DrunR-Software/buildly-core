@@ -538,3 +538,21 @@ class Subscription(models.Model):
         verbose_name = "Subscription"
         verbose_name_plural = "Subscriptions"
         ordering = ['-create_date']
+
+
+class ResetPasswordToken(models.Model):
+    token = models.CharField(primary_key=True, unique=True, max_length=8, editable=False)
+    uid = models.UUIDField(
+        verbose_name='User UUID',
+        editable=False,
+        help_text='UUID of the user for whom this token is generated'
+    )
+    expires_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return self.token
+
+    class Meta:
+        verbose_name = "Reset Password Token"
+        verbose_name_plural = "Reset Password Tokens"
+        ordering = ['-expires_at']

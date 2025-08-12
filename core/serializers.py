@@ -1,6 +1,9 @@
 import jwt
+import random
+import string
 import secrets
 from urllib.parse import urljoin
+from datetime import timedelta, timezone
 
 from django.contrib.auth import password_validation
 from django.contrib.auth.tokens import default_token_generator
@@ -16,7 +19,7 @@ from core.email_utils import send_email, send_email_body
 from core.helpers.oauth import EmailVerificationToken
 
 from core.models import CoreUser, CoreGroup, EmailTemplate, LogicModule, Organization, OrganizationType, PERMISSIONS_ORG_ADMIN, \
-    TEMPLATE_RESET_PASSWORD, PERMISSIONS_VIEW_ONLY, Partner, Subscription, Coupon, Referral, ROLE_ORGANIZATION_ADMIN
+    TEMPLATE_RESET_PASSWORD, PERMISSIONS_VIEW_ONLY, Partner, Subscription, Coupon, Referral, ROLE_ORGANIZATION_ADMIN, ResetPasswordToken
 
 
 class LogicModuleSerializer(serializers.ModelSerializer):
@@ -341,16 +344,17 @@ class CoreUserResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
     def save(self, **kwargs):
-        resetpass_url = urljoin(settings.FRONTEND_URL, settings.RESETPASS_CONFIRM_URL_PATH)
-
         email = self.validated_data["email"]
 
         count = 0
         for user in CoreUser.objects.filter(email=email, is_active=True):
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
+            token = ResetPasswordToken.objects.create(
+                token=''.join(random.sample(string.ascii_letters, 8)),
+                uid=user.pk,
+                expires_at=timezone.now() + timedelta(hours=settings.INVITATION_EXPIRE_HOURS)
+            )
             context = {
-                'password_reset_link': f'{resetpass_url}{uid}/{token}/',
+                'reset_code': token.token,
                 'user': user,
             }
 
@@ -378,20 +382,18 @@ class CoreUserResetPasswordSerializer(serializers.Serializer):
 class CoreUserResetPasswordCheckSerializer(serializers.Serializer):
     """Serializer for checking token for resetting password
     """
-    uid = serializers.CharField()
     token = serializers.CharField()
 
     def validate(self, attrs):
         # Decode the uidb64 to uid to get User object
         try:
-            uid = force_str(urlsafe_base64_decode(attrs['uid']))
-            self.user = CoreUser.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, CoreUser.DoesNotExist):
-            raise serializers.ValidationError({'uid': ['Invalid value']})
+            reset_token = ResetPasswordToken.objects.get(pk=attrs['token'])
+            if timezone.now() > reset_token.expires_at:
+                raise serializers.ValidationError({'token': ['Token has expired']})
 
-        # Check the token
-        if not default_token_generator.check_token(self.user, attrs['token']):
-            raise serializers.ValidationError({'token': ['Invalid value']})
+            self.user = CoreUser.objects.get(pk=reset_token.uid)
+        except (CoreUser.DoesNotExist):
+            raise serializers.ValidationError({'user': ['User not registered with us']})
 
         return attrs
 
