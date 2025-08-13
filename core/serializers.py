@@ -390,7 +390,10 @@ class CoreUserResetPasswordCheckSerializer(serializers.Serializer):
             reset_token = ResetPasswordToken.objects.get(pk=attrs['token'])
             if timezone.now() > reset_token.expires_at:
                 raise serializers.ValidationError({'token': ['Token has expired']})
+        except (ResetPasswordToken.DoesNotExist):
+            raise serializers.ValidationError({'token': ['Invalid token. Please cross chec the token.']})
 
+        try:
             self.user = CoreUser.objects.get(pk=reset_token.uid)
         except (CoreUser.DoesNotExist):
             raise serializers.ValidationError({'user': ['User not registered with us']})
