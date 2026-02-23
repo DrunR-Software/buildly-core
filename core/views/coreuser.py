@@ -258,7 +258,7 @@ class CoreUserViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
         count = serializer.save()
         return Response(
             {
-                'detail': 'The reset password link was sent successfully.',
+                'detail': 'The reset password code was sent successfully.',
                 'count': count,
             },
             status=status.HTTP_200_OK)
