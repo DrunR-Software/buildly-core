@@ -246,25 +246,25 @@ class CoreUserWritableSerializer(CoreUserSerializer):
         coreuser.core_groups.add(*core_groups)
 
         # create or update an invitation
-        EmailVerificationToken().send_verification_email(self.context['request'], coreuser)
-        reg_location = urljoin(settings.FRONTEND_URL, settings.VERIFY_EMAIL_URL_PATH)
-        reg_location = reg_location + '{}'
-        token = urlsafe_base64_encode(force_bytes(coreuser.core_user_uuid))
+        # EmailVerificationToken().send_verification_email(self.context['request'], coreuser)
+        # reg_location = urljoin(settings.FRONTEND_URL, settings.VERIFY_EMAIL_URL_PATH)
+        # reg_location = reg_location + '{}'
+        # token = urlsafe_base64_encode(force_bytes(coreuser.core_user_uuid))
 
-        # build the invitation link
-        verification_link = self.context['request'].build_absolute_uri(
-            reg_location.format(token)
-        )
+        # # build the invitation link
+        # verification_link = self.context['request'].build_absolute_uri(
+        #     reg_location.format(token)
+        # )
 
-        # create the user context for the E-mail templates
-        context = {
-            'verification_link': verification_link,
-            'user': coreuser,
-        }
-        subject = 'Account verification required'  # TODO we need to make this dynamic
-        template_name = 'email/coreuser/email_verification.txt'
-        html_template_name = 'email/coreuser/email_verification.html'
-        send_email(coreuser.email, subject, context, template_name, html_template_name)
+        # # create the user context for the E-mail templates
+        # context = {
+        #     'verification_link': verification_link,
+        #     'user': coreuser,
+        # }
+        # subject = 'Account verification required'  # TODO we need to make this dynamic
+        # template_name = 'email/coreuser/email_verification.txt'
+        # html_template_name = 'email/coreuser/email_verification.html'
+        # send_email(coreuser.email, subject, context, template_name, html_template_name)
 
         return coreuser
 
