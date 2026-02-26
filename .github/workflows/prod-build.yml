@@ -76,7 +76,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         TARGET_REPO: "DrunR-Software/ops"
         TARGET_FILE: "drunr-prod/buildly-core/templates/manifest.yaml"
-        TARGET_BRANCH: "prod"
+        TARGET_BRANCH: "main"
         IMAGE_TAG: "build-${{ github.run_number }}"
       run: |
         echo "🚀 Updating Prod manifest to use $IMAGE_NAME:$IMAGE_TAG"
