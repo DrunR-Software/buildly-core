@@ -40,6 +40,7 @@ INSTALLED_APPS_THIRD_PARTIES = [
     # health check
     'health_check',  # required
     'health_check.db',  # stock Django health checkers
+    'social_django',
 ]
 
 INSTALLED_APPS_LOCAL = ['buildly', 'gateway', 'core', 'datamesh']
@@ -78,6 +79,8 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
             'builtins': [  # TODO to delete?
                 'django.templatetags.static'
@@ -93,6 +96,9 @@ AUTH_USER_MODEL = 'core.CoreUser'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default backend
     # Add custom backends here if applicable
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.apple.AppleIdAuth',
 ]
 
 # Internationalization
@@ -175,3 +181,26 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     # Add other options as needed
 }
+
+# Social Auth (Google / Apple / Facebook)
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY', '')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET', '')
+SOCIAL_AUTH_FACEBOOK_APP_KEY = os.getenv('SOCIAL_AUTH_FACEBOOK_APP_KEY', '')
+SOCIAL_AUTH_FACEBOOK_APP_SECRET = os.getenv('SOCIAL_AUTH_FACEBOOK_APP_SECRET', '')
+SOCIAL_AUTH_APPLE_ID_CLIENT = os.getenv('SOCIAL_AUTH_APPLE_ID_CLIENT', '')
+SOCIAL_AUTH_APPLE_ID_TEAM = os.getenv('SOCIAL_AUTH_APPLE_ID_TEAM', '')
+SOCIAL_AUTH_APPLE_ID_KEY = os.getenv('SOCIAL_AUTH_APPLE_ID_KEY', '')
+SOCIAL_AUTH_APPLE_ID_SECRET = os.getenv('SOCIAL_AUTH_APPLE_ID_SECRET', '')
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'core.auth_pipeline.set_username_from_email',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'core.auth_pipeline.assign_social_auth_organization',
+)

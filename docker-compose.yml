@@ -92,6 +92,14 @@ services:
       MAILERSEND_TOKEN: "SMTP"
       MAILERSEND_SMTP_USERNAME: "// put mailersend smtp username here"
       MAILERSEND_SMTP_PASSWORD: "// put mailersend smtp password here"
+      SOCIAL_AUTH_GOOGLE_OAUTH2_KEY: "// put google oauth2 key here"
+      SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET: "// put google oauth2 secret here"
+      SOCIAL_AUTH_FACEBOOK_APP_KEY: "// put facebook app key here"
+      SOCIAL_AUTH_FACEBOOK_APP_SECRET: "// put facebook app secret here"
+      SOCIAL_AUTH_APPLE_ID_CLIENT: "// put apple id client here"
+      SOCIAL_AUTH_APPLE_ID_TEAM: "// put apple id team here"
+      SOCIAL_AUTH_APPLE_ID_KEY: "// put apple id key here"
+      SOCIAL_AUTH_APPLE_ID_SECRET: "// put apple id secret here"
 
 volumes:
   static-content:

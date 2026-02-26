@@ -6,6 +6,7 @@ from rest_framework import routers
 
 from core import views
 from core.views.homepage import index
+from core.views.social_auth import SocialConvertTokenView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -34,6 +35,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('health_check/', include('health_check.urls')),
     path('datamesh/', include('datamesh.urls')),
+    path('auth/convert-token/', SocialConvertTokenView.as_view(), name='convert_token'),
     path('', include('gateway.urls')),
     path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

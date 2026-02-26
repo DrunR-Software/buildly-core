@@ -4,9 +4,37 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import render
 from django.conf import settings
 
-from core.models import CoreSites, Organization
+from core.models import CoreGroup, CoreSites, Organization
 
 logger = logging.getLogger(__name__)
+
+
+def set_username_from_email(details, *args, **kwargs):
+    """Use the provider email as the Django username."""
+    return {'username': details.get('email', '')}
+
+
+def assign_social_auth_organization(user=None, is_new=False, *args, **kwargs):
+    """
+    Assign newly created social auth users to the default organization
+    and add them to that organization's default Users CoreGroup.
+    """
+    if not user or not is_new:
+        return
+
+    try:
+        organization = Organization.objects.get(name__iexact='drunr')
+    except Organization.DoesNotExist:
+        organization = Organization.objects.create(name='drunr')
+
+    user.organization = organization
+    user.save()
+
+    default_group = CoreGroup.objects.filter(
+        organization=organization, is_default=True
+    ).first()
+    if default_group:
+        user.core_groups.add(default_group)
 
 
 def create_organization(core_user=None, *args, **kwargs):
